@@ -12,6 +12,27 @@
             android:visibility="gone"
             android:id="@+id/cameraView"
             opencv:show_fps="true"
-            opencv:camera_id="any" />
+            opencv:camera_id="any"/>
+
+    <ImageView
+            android:id="@+id/sign1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/android"
+            weight="1"/>
+
+    <ImageView
+            android:id="@+id/sign2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/android"
+            weight="1"/>
+
+    <ImageView
+            android:id="@+id/sign3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/android"
+            weight="1"/>
 
     </LinearLayout>

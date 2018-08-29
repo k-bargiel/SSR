@@ -25,8 +25,10 @@ import java.lang.reflect.Method;
 
 public class MainActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener {
 
+    private long framesCount = 0;
     private static final String TAG = "TAG";
     private CameraBridgeViewBase mOpenCvCameraView;
+
 
     static {
         if (OpenCVLoader.initDebug()) {
@@ -52,15 +54,6 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     };
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (OpenCVLoader.initDebug()) {
-            Log.i("Success", "Success");
-            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-        }
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
 
         if (this.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -78,13 +71,12 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         mOpenCvCameraView.setCvCameraViewListener(this);
     }
 
-    protected void setDisplayOrientation(Camera camera, int angle) {
-        Method downPolymorphic;
-        try {
-            downPolymorphic = camera.getClass().getMethod("setDisplayOrientation", int.class);
-            if (downPolymorphic != null)
-                downPolymorphic.invoke(camera, angle);
-        } catch (Exception e1) {
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (OpenCVLoader.initDebug()) {
+            Log.i("Success", "Success");
+            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
     }
 
@@ -95,6 +87,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
             mOpenCvCameraView.disableView();
     }
 
+    @Override
     public void onDestroy() {
         super.onDestroy();
         if (mOpenCvCameraView != null)
@@ -108,34 +101,15 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     }
 
     public Mat onCameraFrame(Mat inputFrame) {
-        Mat hsv = new Mat();
-//        Imgproc.medianBlur(inputFrame, inputFrame, 5);
-        Imgproc.cvtColor(inputFrame, hsv, Imgproc.COLOR_RGB2HSV);
-        Mat lowerRed = new Mat();
-        Mat upperRed = new Mat();
-        Core.inRange(hsv, new Scalar(0, 100, 100), new Scalar(10, 255, 255), lowerRed);
-        Core.inRange(hsv, new Scalar(160, 100, 100), new Scalar(179, 255, 255), upperRed);
-        Core.addWeighted(lowerRed, 1.0, upperRed, 1.0, 0.0, hsv);
-        double dp = 1d;
-        int minRadius = 0;
-        int maxRadius = 0;
-        double param1 = 100;
-        double param2 = 20;
-        Mat circles = new Mat();
-        Imgproc.GaussianBlur(hsv, hsv, new Size(9,9), 2, 2);
-        Imgproc.HoughCircles(hsv, circles, Imgproc.CV_HOUGH_GRADIENT, dp, inputFrame.rows() / 8, param1, param2, 100, maxRadius);
-        for (int x = 0; x < circles.cols(); x++) {
-            double[] c = circles.get(0, x);
-            Point center = new Point(Math.round(c[0]), Math.round(c[1]));
-            // circle center
-            Imgproc.circle(inputFrame, center, 1, new Scalar(0, 100, 100), 3, 8, 0);
-            // circle outline
-            int radius = (int) Math.round(c[2]);
-            Imgproc.circle(inputFrame, center, radius, new Scalar(255, 0, 255), 3, 8, 0);
+        framesCount++;
+        if(framesCount % 99999 == 0){
+            framesCount = 0;
         }
-        lowerRed.release();
-        upperRed.release();
-//        hsv.release();
-        return hsv;
+
+        if (framesCount % 10 == 0) {
+            recognizeCirles(inputFrame);
+        }
+
+        return inputFrame;
     }
 }
