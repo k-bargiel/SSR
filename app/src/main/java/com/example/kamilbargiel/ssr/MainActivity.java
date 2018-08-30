@@ -17,11 +17,14 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.opencv.imgcodecs.Imgcodecs.CV_LOAD_IMAGE_COLOR;
+import static org.opencv.imgcodecs.Imgcodecs.CV_LOAD_IMAGE_UNCHANGED;
 
 public class MainActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener {
 
@@ -110,7 +113,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         List<Mat> signsRecognized;
         Mat img = new Mat();
         try {
-            img = Utils.loadResource(this, R.drawable.info1, CV_LOAD_IMAGE_COLOR);
+            img = Utils.loadResource(this, R.drawable.info1, CV_LOAD_IMAGE_UNCHANGED);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -118,7 +121,6 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         if (framesCount % 50 == 0) {
             Log.i("MainActivity", "Next 50 frame");
             signsRecognized = CircleRecognize.cirleRecognize(img);
-            Log.w("SIZE!", Integer.toString(signsRecognized.size()));
             showSignsOnScreen(signsRecognized);
         }
 
@@ -134,6 +136,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
                     for (Mat circle : circles) {
                         ImageView imageView = (ImageView) SsrUtils.findProperView(MainActivity.this, signViewCount);
                         Bitmap bmp = Bitmap.createBitmap(circle.width(), circle.height(), Bitmap.Config.ARGB_8888);
+                        Imgproc.cvtColor(circle, circle, Imgproc.COLOR_BGR2RGB);
                         Utils.matToBitmap(circle, bmp);
                         imageView.setImageBitmap(bmp);
                         imageView.setVisibility(View.VISIBLE);
