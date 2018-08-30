@@ -16,7 +16,7 @@ public class CircleRecognize {
 
     private static final double dp = 1d;
     private static final int minRadius = 0;
-    private static final int maxRadius = 0;
+    private static final int maxRadius = 20;
     private static final double param1 = 100;
     private static final double param2 = 20;
 
@@ -31,7 +31,7 @@ public class CircleRecognize {
         Core.inRange(hsv, new Scalar(160, 100, 100), new Scalar(179, 255, 255), upperRed);
         Core.addWeighted(lowerRed, 1.0, upperRed, 1.0, 0.0, hsv);
         Imgproc.GaussianBlur(hsv, hsv, new Size(9, 9), 2, 2);
-        Imgproc.HoughCircles(hsv, circles, Imgproc.CV_HOUGH_GRADIENT, dp, hsv.rows() / 8, param1, param2, 0, 20);
+        Imgproc.HoughCircles(hsv, circles, Imgproc.CV_HOUGH_GRADIENT, dp, hsv.rows() / 8, param1, param2, minRadius, maxRadius);
         ArrayList<Mat> images = new ArrayList<>();
 
         for (int x = 0; x < circles.cols(); x++) {
@@ -51,8 +51,10 @@ public class CircleRecognize {
     }
 
     private static Mat getCircleFromImage(Mat inputFrame, Point center, int radius) {
+        Mat mat = new Mat();
+        inputFrame.copyTo(mat);
         Rect rect = new Rect(new Point(center.x - (radius + 1), center.y - (radius + 1)), new Point(center.x + (radius + 1), center.y + (radius + 1)));
-        return new Mat(inputFrame, rect);
+        return new Mat(mat, rect);
     }
 
 }

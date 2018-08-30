@@ -113,7 +113,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         List<Mat> signsRecognized;
         Mat img = new Mat();
         try {
-            img = Utils.loadResource(this, R.drawable.info1, CV_LOAD_IMAGE_UNCHANGED);
+            img = Utils.loadResource(this, R.drawable.test, CV_LOAD_IMAGE_UNCHANGED);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,8 +123,6 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
             signsRecognized = CircleRecognize.cirleRecognize(img);
             showSignsOnScreen(signsRecognized);
         }
-
-
         return frame;
     }
 
