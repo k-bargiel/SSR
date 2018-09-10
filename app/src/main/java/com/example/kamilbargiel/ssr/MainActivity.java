@@ -2,6 +2,7 @@ package com.example.kamilbargiel.ssr;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -32,7 +33,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     private short signViewCount = 0;
     private static final String TAG = "TAG";
     private CameraBridgeViewBase mOpenCvCameraView;
-
+    private List<Mat> images;
 
     static {
         if (OpenCVLoader.initDebug()) {
@@ -72,6 +73,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         mOpenCvCameraView.setMaxFrameSize(640, 480);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
+        images = getAllImages(this);
     }
 
     @Override
@@ -111,17 +113,20 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         }
 
         List<Mat> signsRecognized;
-        Mat img = new Mat();
-        try {
-            img = Utils.loadResource(this, R.drawable.test, CV_LOAD_IMAGE_UNCHANGED);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        if (framesCount % 50 == 0) {
-            Log.i("MainActivity", "Next 50 frame");
-            signsRecognized = CircleRecognize.cirleRecognize(img);
-            showSignsOnScreen(signsRecognized);
+        if (framesCount % 25 == 0) {
+            Log.i("MainActivity", "Next 25 frame");
+//            if(images.size() > 0) {
+            try {
+                signsRecognized = CircleRecognize.cirleRecognize(frame);  // images.remove(images.size() - 1)
+                showSignsOnScreen(signsRecognized);
+            } catch (Exception e){
+                Log.e("Main activity", "EXCEPTION!");
+                Log.getStackTraceString(e);
+            }
+//            } else {
+//                images = getAllImages(this);
+//            }
         }
         return frame;
     }
@@ -134,7 +139,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
                     for (Mat circle : circles) {
                         ImageView imageView = (ImageView) SsrUtils.findProperView(MainActivity.this, signViewCount);
                         Bitmap bmp = Bitmap.createBitmap(circle.width(), circle.height(), Bitmap.Config.ARGB_8888);
-                        Imgproc.cvtColor(circle, circle, Imgproc.COLOR_BGR2RGB);
+//                        Imgproc.cvtColor(circle, circle, Imgproc.COLOR_BGR2RGB);
                         Utils.matToBitmap(circle, bmp);
                         imageView.setImageBitmap(bmp);
                         imageView.setVisibility(View.VISIBLE);
@@ -146,6 +151,26 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
                 }
             });
         }
+    }
+
+    private List<Mat> getAllImages(final Context context){
+        return new ArrayList<Mat>(){{
+            try {
+                add(Utils.loadResource(context, R.drawable.aaaa, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.burst, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.busrtaw, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.tescik, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.test, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.tree, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.aaaaaaa, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.nowy15, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.nowy12, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.piec, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.halo, CV_LOAD_IMAGE_UNCHANGED));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }};
     }
 
 }
