@@ -26,8 +26,11 @@ public class CircleRecognize {
         Mat lowerRed = new Mat();
         Mat upperRed = new Mat();
         Mat circles = new Mat();
+        Mat blurred = new Mat();
 
-        Imgproc.cvtColor(inputFrame, hsv, Imgproc.COLOR_BGR2HSV);
+        Imgproc.medianBlur(inputFrame, blurred, 3);
+        Imgproc.cvtColor(blurred, hsv, Imgproc.COLOR_RGB2HSV);
+//        Imgproc.cvtColor(blurred, hsv, Imgproc.COLOR_BGR2HSV);
         Core.inRange(hsv, new Scalar(0, 70, 50), new Scalar(10, 255, 255), lowerRed);
         Core.inRange(hsv, new Scalar(170, 70, 50), new Scalar(179, 255, 255), upperRed);
 //        Core.inRange(hsv, new Scalar(0, 100, 100), new Scalar(10, 255, 255), lowerRed);

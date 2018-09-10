@@ -114,7 +114,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
 
         List<Mat> signsRecognized;
 
-        if (framesCount % 25 == 0) {
+        if (framesCount % 35 == 0) {
             Log.i("MainActivity", "Next 25 frame");
 //            if(images.size() > 0) {
             try {
