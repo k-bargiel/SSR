@@ -1,5 +1,6 @@
 package com.example.kamilbargiel.ssr;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.opencv.core.Core;
@@ -13,15 +14,17 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.kamilbargiel.ssr.SsrUtils.saveOnDevice;
+
 public class CircleRecognize {
 
-    private static final double dp = 0.4d;
-    private static final int minRadius = 100;
-    private static final int maxRadius = 150;
+    private static final double dp = 1.0d;
+    private static final int minRadius = 5;
+    private static final int maxRadius = 0;
     private static final double param1 = 100;
-    private static final double param2 = 20;
+    private static final double param2 = 38;
 
-    public static ArrayList<Mat> cirleRecognize(Mat inputFrame) {
+    public static ArrayList<Mat> cirleRecognize(Mat inputFrame, Context context) {
         Mat hsv = new Mat();
         Mat lowerRed = new Mat();
         Mat upperRed = new Mat();
@@ -29,8 +32,8 @@ public class CircleRecognize {
         Mat blurred = new Mat();
 
         Imgproc.medianBlur(inputFrame, blurred, 3);
-        Imgproc.cvtColor(blurred, hsv, Imgproc.COLOR_RGB2HSV);
-//        Imgproc.cvtColor(blurred, hsv, Imgproc.COLOR_BGR2HSV);
+        Imgproc.cvtColor(blurred, hsv, Imgproc.COLOR_RGB2HSV); // device frame
+//        Imgproc.cvtColor(blurred, hsv, Imgproc.COLOR_BGR2HSV); // image frame
         Core.inRange(hsv, new Scalar(0, 70, 50), new Scalar(10, 255, 255), lowerRed);
         Core.inRange(hsv, new Scalar(170, 70, 50), new Scalar(179, 255, 255), upperRed);
 //        Core.inRange(hsv, new Scalar(0, 100, 100), new Scalar(10, 255, 255), lowerRed);
@@ -39,7 +42,7 @@ public class CircleRecognize {
         Imgproc.GaussianBlur(hsv, hsv, new Size(9, 9), 2, 2);
         Imgproc.HoughCircles(hsv, circles, Imgproc.CV_HOUGH_GRADIENT, dp, 75, param1, param2, minRadius, maxRadius);
         ArrayList<Mat> images = new ArrayList<>();
-        images.add(hsv);
+//        images.add(hsv);
 
         for (int x = 0; x < circles.cols(); x++) {
             Log.i("CircleRecognize", "Found circle!");
@@ -48,12 +51,14 @@ public class CircleRecognize {
             int radius = (int) Math.round(c[2]);
             Mat sign = getCircleFromImage(inputFrame, center, radius);
             if(sign != null){
+                saveOnDevice(sign, context);
                 images.add(sign);
             }
             Imgproc.circle(inputFrame, center, 1, new Scalar(0, 100, 100), 3, 8, 0);
-            Imgproc.circle(inputFrame, center, radius, new Scalar(255, 0, 255), 3, 8, 0);
+            Imgproc.circle(inputFrame, center, radius, new Scalar(0, 255, 0), 3, 8, 0);
         }
-//        images.add(inputFrame);
+        images.add(inputFrame);
+        saveOnDevice(hsv, context);
 
         lowerRed.release();
         upperRed.release();
@@ -64,10 +69,11 @@ public class CircleRecognize {
     private static Mat getCircleFromImage(Mat inputFrame, Point center, int radius) {
         Mat mat = new Mat();
         inputFrame.copyTo(mat);
-        Rect rect = new Rect(new Point(center.x - (radius + 1), center.y - (radius + 1)), new Point(center.x + (radius + 1), center.y + (radius + 1)));
+        Rect rect = new Rect(new Point(center.x - (radius + 2), center.y - (radius + 2)), new Point(center.x + (radius + 2), center.y + (radius + 2)));
         try {
             return new Mat(mat, rect);
         } catch (Exception e){
+            Log.getStackTraceString(e);
             return null;
         }
     }

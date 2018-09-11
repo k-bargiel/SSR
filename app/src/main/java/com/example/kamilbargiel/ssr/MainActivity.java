@@ -17,9 +17,11 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     private static final String TAG = "TAG";
     private CameraBridgeViewBase mOpenCvCameraView;
     private List<Mat> images;
+    private Mat frame;
 
     static {
         if (OpenCVLoader.initDebug()) {
@@ -63,6 +66,9 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
 
         if (this.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             this.requestPermissions(new String[]{Manifest.permission.CAMERA}, 3);
+        }
+        if (this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            this.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 3);
         }
 
         super.onCreate(savedInstanceState);
@@ -100,13 +106,15 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     }
 
     public void onCameraViewStarted(int width, int height) {
+        frame = new Mat();
     }
 
     public void onCameraViewStopped() {
-//        inputFrame.release();
+        frame.release();
     }
 
     public Mat onCameraFrame(Mat frame) {
+        this.frame = frame;
         framesCount++;
         if (framesCount % 99999 == 0) {
             framesCount = 0;
@@ -116,11 +124,13 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
 
         if (framesCount % 35 == 0) {
             Log.i("MainActivity", "Next 25 frame");
-//            if(images.size() > 0) {
+            SsrUtils.saveOnDevice(frame, this);
+//            if (images.size() > 0) {
             try {
-                signsRecognized = CircleRecognize.cirleRecognize(frame);  // images.remove(images.size() - 1)
+                signsRecognized = CircleRecognize.cirleRecognize(frame, this);
+//                signsRecognized = CircleRecognize.cirleRecognize(images.remove(images.size() - 1), this);
                 showSignsOnScreen(signsRecognized);
-            } catch (Exception e){
+            } catch (Exception e) {
                 Log.e("Main activity", "EXCEPTION!");
                 Log.getStackTraceString(e);
             }
@@ -138,8 +148,8 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
                 public void run() {
                     for (Mat circle : circles) {
                         ImageView imageView = (ImageView) SsrUtils.findProperView(MainActivity.this, signViewCount);
+                        Imgproc.cvtColor(circle, circle, Imgproc.COLOR_BGR2RGB);
                         Bitmap bmp = Bitmap.createBitmap(circle.width(), circle.height(), Bitmap.Config.ARGB_8888);
-//                        Imgproc.cvtColor(circle, circle, Imgproc.COLOR_BGR2RGB);
                         Utils.matToBitmap(circle, bmp);
                         imageView.setImageBitmap(bmp);
                         imageView.setVisibility(View.VISIBLE);
@@ -153,20 +163,23 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         }
     }
 
-    private List<Mat> getAllImages(final Context context){
-        return new ArrayList<Mat>(){{
+    private List<Mat> getAllImages(final Context context) {
+        return new ArrayList<Mat>() {{
             try {
-                add(Utils.loadResource(context, R.drawable.aaaa, CV_LOAD_IMAGE_UNCHANGED));
-                add(Utils.loadResource(context, R.drawable.burst, CV_LOAD_IMAGE_UNCHANGED));
-                add(Utils.loadResource(context, R.drawable.busrtaw, CV_LOAD_IMAGE_UNCHANGED));
-                add(Utils.loadResource(context, R.drawable.tescik, CV_LOAD_IMAGE_UNCHANGED));
-                add(Utils.loadResource(context, R.drawable.test, CV_LOAD_IMAGE_UNCHANGED));
-                add(Utils.loadResource(context, R.drawable.tree, CV_LOAD_IMAGE_UNCHANGED));
-                add(Utils.loadResource(context, R.drawable.aaaaaaa, CV_LOAD_IMAGE_UNCHANGED));
-                add(Utils.loadResource(context, R.drawable.nowy15, CV_LOAD_IMAGE_UNCHANGED));
-                add(Utils.loadResource(context, R.drawable.nowy12, CV_LOAD_IMAGE_UNCHANGED));
-                add(Utils.loadResource(context, R.drawable.piec, CV_LOAD_IMAGE_UNCHANGED));
-                add(Utils.loadResource(context, R.drawable.halo, CV_LOAD_IMAGE_UNCHANGED));
+//                add(Utils.loadResource(context, R.drawable.a1, CV_LOAD_IMAGE_UNCHANGED));
+//                add(Utils.loadResource(context, R.drawable.a2, CV_LOAD_IMAGE_UNCHANGED));
+//                add(Utils.loadResource(context, R.drawable.a3, CV_LOAD_IMAGE_UNCHANGED));
+//                add(Utils.loadResource(context, R.drawable.a4, CV_LOAD_IMAGE_UNCHANGED));
+//                add(Utils.loadResource(context, R.drawable.a5, CV_LOAD_IMAGE_UNCHANGED));
+//                add(Utils.loadResource(context, R.drawable.a6, CV_LOAD_IMAGE_UNCHANGED));
+//                add(Utils.loadResource(context, R.drawable.a7, CV_LOAD_IMAGE_UNCHANGED));
+//                add(Utils.loadResource(context, R.drawable.a8, CV_LOAD_IMAGE_UNCHANGED));
+//                add(Utils.loadResource(context, R.drawable.a9, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.b1, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.b2, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.b3, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.b4, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.b5, CV_LOAD_IMAGE_UNCHANGED));
             } catch (IOException e) {
                 e.printStackTrace();
             }
