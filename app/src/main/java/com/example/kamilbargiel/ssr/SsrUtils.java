@@ -3,15 +3,18 @@ package com.example.kamilbargiel.ssr;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.File;
+import java.util.List;
 
 public class SsrUtils {
 
@@ -30,7 +33,7 @@ public class SsrUtils {
         }
     }
 
-    public static void saveOnDevice(Mat input, Context context){
+    public static void saveOnDevice(Mat input, Context context) {
 //        Imgproc.cvtColor(input, input, Imgproc.COLOR_BGR2RGB);
         Bitmap bmp = Bitmap.createBitmap(input.width(), input.height(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(input, bmp);
