@@ -57,11 +57,19 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     private EditText param1ET;
     private EditText param2ET;
     private EditText dpET;
-    private int minRad = 5;
-    private int maxRad = 150;
+    private int minRad = 3;
+    private int maxRad = 200;
     private double param1 = 190;
     private double param2 = 65;
     private double dp = 0.4;
+
+    /*
+      private int minRad = 3;
+    private int maxRad = 200;
+    private double param1 = 180;
+    private double param2 = 60;
+    private double dp = 0.4;
+     */
 
     static {
         if (OpenCVLoader.initDebug()) {
@@ -143,11 +151,6 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame openCvFrame) {
         this.frame = openCvFrame.rgba();
-        Log.i("min", Integer.toString(minRad));
-        Log.i("max", Integer.toString(maxRad));
-        Log.i("param1", Double.toString(param1));
-        Log.i("param2", Double.toString(param2));
-        Log.i("dp", Double.toString(dp));
         framesCount++;
         if (framesCount % 99999 == 0) {
             framesCount = 0;
@@ -155,20 +158,22 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
 
         List<Mat> signsRecognized;
 
-        if (framesCount % 5 == 0) {
-            Log.i("MainActivity", "Next 25 frame");
+        if (framesCount % 2 == 0) {
 //            SsrUtils.saveOnDevice(frame, this);
 //            if (images.size() > 0) {
             try {
-                signsRecognized = CircleRecognize.cirleRecognize(frame, this, minRad, maxRad, param1, param2, dp);
+//                signsRecognized = CircleRecognize.cirleRecognize(frame, this, minRad, maxRad, param1, param2, dp);
+                signsRecognized = TraingleDetection.detectTriangles(frame, this);
+//                signsRecognized = SquareRecognize.squareRecognition(frame);
 //                signsRecognized = CircleRecognize.cirleRecognize(images.remove(images.size() - 1), this, minRad, maxRad, param1, param2, dp);
-//                    signsRecognized = CircleRecognize2.cirleRecognize(frame, this);
+//                signsRecognized = CircleRecognize2.cirleRecognize(frame, this);
 //                signsRecognized = CircleRecognize2.cirleRecognize(images.remove(images.size() - 1), this);
                 showSignsOnScreen(signsRecognized);
             } catch (Exception e) {
                 Log.e("Main activity", "EXCEPTION!", e);
             }
-//            } else {
+//            }
+//            else {
 //                images = getAllImages(this);
 //            }
         }
@@ -203,7 +208,12 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
             try {
 //                add(Utils.loadResource(context, R.drawable.fhd1, CV_LOAD_IMAGE_UNCHANGED));
 //                add(Utils.loadResource(context, R.drawable.saturation, CV_LOAD_IMAGE_UNCHANGED));
-                add(Utils.loadResource(context, R.drawable.adjusted, CV_LOAD_IMAGE_UNCHANGED));
+//                add(Utils.loadResource(context, R.drawable.adjusted, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.p1, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.p2, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.p3, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.p4, CV_LOAD_IMAGE_UNCHANGED));
+                add(Utils.loadResource(context, R.drawable.p5, CV_LOAD_IMAGE_UNCHANGED));
             } catch (IOException e) {
                 e.printStackTrace();
             }
