@@ -31,14 +31,15 @@ public class TraingleDetection {
 //        Imgproc.medianBlur(inputFrame, blurred, 3);
         Imgproc.cvtColor(inputFrame, hsv, Imgproc.COLOR_RGB2HSV); // device frame
 
-        Core.inRange(hsv, new Scalar(18, 148, 66), new Scalar(30, 255, 255), yellow);
+        Core.inRange(hsv, new Scalar(15, 0, 66), new Scalar(45, 255, 255), yellow);
+        output.add(yellow);
         Imgproc.GaussianBlur(yellow, yellow, new Size(5, 5), 0);
         Imgproc.findContours(yellow, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         for (MatOfPoint cnt : contours) {
             double contourArea = Imgproc.contourArea(cnt);
             double area = Math.abs(contourArea);
-            if (area < 700) {
+            if (area < 600) {
                 continue;
             }
 

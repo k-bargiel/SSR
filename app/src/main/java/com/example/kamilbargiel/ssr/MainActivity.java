@@ -163,7 +163,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
 //            if (images.size() > 0) {
             try {
 //                signsRecognized = CircleRecognize.cirleRecognize(frame, this, minRad, maxRad, param1, param2, dp);
-                signsRecognized = TraingleDetection.detectTriangles(frame, this);
+                signsRecognized = (TraingleDetection.detectTriangles(frame, this));
 //                signsRecognized = SquareRecognize.squareRecognition(frame);
 //                signsRecognized = CircleRecognize.cirleRecognize(images.remove(images.size() - 1), this, minRad, maxRad, param1, param2, dp);
 //                signsRecognized = CircleRecognize2.cirleRecognize(frame, this);
@@ -187,12 +187,10 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
                 public void run() {
                     mp.start();
                     for (Mat circle : circles) {
-                        ImageView imageView = (ImageView) SsrUtils.findProperView(MainActivity.this, signViewCount);
 //                        Imgproc.cvtColor(circle, circle, Imgproc.COLOR_BGR2RGB);
                         Bitmap bmp = Bitmap.createBitmap(circle.width(), circle.height(), Bitmap.Config.ARGB_8888);
                         Utils.matToBitmap(circle, bmp);
-                        imageView.setImageBitmap(bmp);
-                        imageView.setVisibility(View.VISIBLE);
+                        SsrUtils.findProperViewAndShowImage(MainActivity.this, signViewCount, bmp);
                         signViewCount++;
                         if (signViewCount % 4 == 0) {
                             signViewCount = 0;
