@@ -32,7 +32,6 @@ public class TraingleDetection {
         Imgproc.cvtColor(inputFrame, hsv, Imgproc.COLOR_RGB2HSV); // device frame
 
         Core.inRange(hsv, new Scalar(15, 0, 66), new Scalar(45, 255, 255), yellow);
-        output.add(yellow);
         Imgproc.GaussianBlur(yellow, yellow, new Size(5, 5), 0);
         Imgproc.findContours(yellow, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
