@@ -19,7 +19,7 @@ import java.util.List;
 
 public class TraingleDetection {
 
-    public static List<Mat> detectTriangles(Mat inputFrame, Context context) {
+    public static List<Mat> detectTriangles(Mat inputFrame, Context context, double eps, int max) {
         Mat hsv = new Mat();
         Mat yellow = new Mat();
         Mat triangles = new Mat();
@@ -32,19 +32,19 @@ public class TraingleDetection {
         Imgproc.cvtColor(inputFrame, hsv, Imgproc.COLOR_RGB2HSV); // device frame
 
         Core.inRange(hsv, new Scalar(15, 0, 66), new Scalar(45, 255, 255), yellow);
-        Imgproc.GaussianBlur(yellow, yellow, new Size(5, 5), 0);
-        Imgproc.findContours(yellow, contours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
+//        Imgproc.GaussianBlur(yellow, yellow, new Size(5, 5), 0);
+        Imgproc.findContours(yellow, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.drawContours(inputFrame, contours, -1, new Scalar(255, 0, 0), 1);
+SsrUtils.saveOnDevice(inputFrame, context);
         for (MatOfPoint cnt : contours) {
             double contourArea = Imgproc.contourArea(cnt);
             double area = Math.abs(contourArea);
-            if (area < 600) {
+            if (area < max) {
                 continue;
             }
-
             double arc = Imgproc.arcLength(new MatOfPoint2f(cnt.toArray()), true);
             MatOfPoint2f approx = new MatOfPoint2f();
-            Imgproc.approxPolyDP(new MatOfPoint2f(cnt.toArray()), approx, 0.2 * arc, true);
+            Imgproc.approxPolyDP(new MatOfPoint2f(cnt.toArray()), approx, eps * arc, true);
             MatOfPoint result = new MatOfPoint(approx.toArray());
             if (result.total() == 3) {
                 Log.i("COUNTOUTES AREA: ", Double.toString(contourArea));
@@ -57,12 +57,10 @@ public class TraingleDetection {
                 triangleContours.add(cnt);
             }
         }
-
-        Imgproc.drawContours(inputFrame, triangleContours, -1, new Scalar(89, 255, 255), 3);
-//        Imgproc.drawContours(inputFrame, contours, -1, new Scalar(89, 255, 255), 5);
-
         SsrUtils.saveOnDevice(inputFrame, context);
         SsrUtils.saveOnDevice(yellow, context);
+//        Imgproc.drawContours(inputFrame, triangleContours, -1, new Scalar(89, 255, 255), 3);
+//        Imgproc.drawContours(inputFrame, contours, -1, new Scalar(89, 255, 255), 5)
 
         hsv.release();
 //        yellow.release();

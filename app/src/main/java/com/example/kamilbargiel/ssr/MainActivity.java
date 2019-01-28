@@ -65,6 +65,10 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
     private double param1 = 190;
     private double param2 = 65;
     private double dp = 0.4;
+    private double epsilon = 0.02;
+    private int areaMax = 50;
+    private EditText epsilonEdit;
+    private EditText maxAreaEdit;
 
     static {
         if (OpenCVLoader.initDebug()) {
@@ -122,7 +126,47 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         }
         this.updateSpeed(null);
+
+        epsilonEdit = (EditText) findViewById(R.id.epsilon);
+        maxAreaEdit = (EditText) findViewById(R.id.area);
+        epsilonEdit.setText(Double.toString(epsilon));
+        maxAreaEdit.setText(Integer.toString(areaMax));
+        epsilonEdit.addTextChangedListener(epsilonWatcher);
+        maxAreaEdit.addTextChangedListener(areaWatcher);
     }
+
+    private final TextWatcher epsilonWatcher = new TextWatcher() {
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            try {
+                epsilon = Double.parseDouble(epsilonEdit.getText().toString());
+            } catch (Exception e){
+                Log.e("ERROR PARSING", "ERROR PRASING");
+            }
+        }
+
+        public void afterTextChanged(Editable s) {
+        }
+    };
+    private final TextWatcher areaWatcher = new TextWatcher() {
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            try {
+                areaMax = Integer.parseInt(maxAreaEdit.getText().toString());
+            } catch (Exception e){
+                Log.e("ERROR PARSING", "ERROR PRASING");
+            }
+        }
+
+        public void afterTextChanged(Editable s) {
+        }
+    };
 
     @Override
     public void onResume() {
@@ -163,16 +207,19 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         }
 
         List<Mat> signsRecognized;
-        Log.e("yrrrrrrrrrrrrrrrrrrrrr", String.valueOf(ignoreFrames));
-        if (ignoreFrames != -1 && (ignoreFrames == 0 || framesCount % ignoreFrames == 0)) {
-        try {
-            signsRecognized = CircleRecognize.cirleRecognize(frame, this, minRad, maxRad, param1, param2, dp);
-//            signsRecognized.addAll(TraingleDetection.detectTriangles(frame, this));
+//        if (ignoreFrames != -1 && (ignoreFrames == 0 || framesCount % ignoreFrames == 0)) {
+//        try {
+        if(framesCount % 200 == 0) {
+//            Log.i("epsiloooooooooooooooon", Double.toString(epsilon));
+//            Log.i("areeeeeeeeeeeeeeeeeeea", Integer.toString(areaMax));
+//            signsRecognized = CircleRecognize.cirleRecognize(frame, this, minRad, maxRad, param1, param2, dp);
+            signsRecognized = TraingleDetection.detectTriangles(frame, this, epsilon, areaMax);
             showSignsOnScreen(signsRecognized);
-        } catch (Exception e) {
-            Log.e("Main activity", "EXCEPTION!", e);
         }
-        }
+//        } catch (Exception e) {
+//            Log.e("Main activity", "EXCEPTION!", e);
+//        }
+//        }
         return frame;
     }
 
@@ -206,9 +253,9 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         }
 
         String strUnits = "km/h";
-        TextView txtCurrentSpeed = (TextView) this.findViewById(R.id.speed);
+//        TextView txtCurrentSpeed = (TextView) this.findViewById(R.id.speed);
         setIgnoreFramesCount(nCurrentSpeed);
-        txtCurrentSpeed.setText(nCurrentSpeed + " " + strUnits);
+//        txtCurrentSpeed.setText(nCurrentSpeed + " " + strUnits);
     }
 
     private void setIgnoreFramesCount(double currentSpeed){

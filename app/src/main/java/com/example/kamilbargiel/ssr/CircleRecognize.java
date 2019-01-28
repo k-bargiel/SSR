@@ -42,6 +42,9 @@ public class CircleRecognize {
             Mat sign = getCircleFromImage(inputFrame, center, radius);
             if (sign != null) {
                 images.add(sign);
+//                SsrUtils.saveOnDevice(hsv, context);
+//                SsrUtils.saveOnDevice(inputFrame, context);
+//                SsrUtils.saveOnDevice(sign, context);
             }
         }
 
