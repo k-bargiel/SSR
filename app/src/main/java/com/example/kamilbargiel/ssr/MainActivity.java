@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.hardware.Camera;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.MediaPlayer;
@@ -15,39 +14,20 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.SurfaceView;
-import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.kamilbargiel.ssr.speed.CLocation;
 import com.example.kamilbargiel.ssr.speed.IBaseGpsListener;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.JavaCamera2View;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Formatter;
 import java.util.List;
-import java.util.Locale;
-
-import static org.opencv.core.CvType.CV_8UC1;
-import static org.opencv.imgcodecs.Imgcodecs.CV_LOAD_IMAGE_COLOR;
-import static org.opencv.imgcodecs.Imgcodecs.CV_LOAD_IMAGE_UNCHANGED;
 
 public class MainActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, IBaseGpsListener {
 
@@ -126,47 +106,7 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
         }
         this.updateSpeed(null);
-
-        epsilonEdit = (EditText) findViewById(R.id.epsilon);
-        maxAreaEdit = (EditText) findViewById(R.id.area);
-        epsilonEdit.setText(Double.toString(epsilon));
-        maxAreaEdit.setText(Integer.toString(areaMax));
-        epsilonEdit.addTextChangedListener(epsilonWatcher);
-        maxAreaEdit.addTextChangedListener(areaWatcher);
     }
-
-    private final TextWatcher epsilonWatcher = new TextWatcher() {
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            try {
-                epsilon = Double.parseDouble(epsilonEdit.getText().toString());
-            } catch (Exception e){
-                Log.e("ERROR PARSING", "ERROR PRASING");
-            }
-        }
-
-        public void afterTextChanged(Editable s) {
-        }
-    };
-    private final TextWatcher areaWatcher = new TextWatcher() {
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
-
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            try {
-                areaMax = Integer.parseInt(maxAreaEdit.getText().toString());
-            } catch (Exception e){
-                Log.e("ERROR PARSING", "ERROR PRASING");
-            }
-        }
-
-        public void afterTextChanged(Editable s) {
-        }
-    };
 
     @Override
     public void onResume() {
@@ -207,19 +147,15 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         }
 
         List<Mat> signsRecognized;
-//        if (ignoreFrames != -1 && (ignoreFrames == 0 || framesCount % ignoreFrames == 0)) {
-//        try {
-        if(framesCount % 200 == 0) {
-//            Log.i("epsiloooooooooooooooon", Double.toString(epsilon));
-//            Log.i("areeeeeeeeeeeeeeeeeeea", Integer.toString(areaMax));
-//            signsRecognized = CircleRecognize.cirleRecognize(frame, this, minRad, maxRad, param1, param2, dp);
-            signsRecognized = TraingleDetection.detectTriangles(frame, this, epsilon, areaMax);
-            showSignsOnScreen(signsRecognized);
+        if (ignoreFrames != -1 && (ignoreFrames == 0 || framesCount % ignoreFrames == 0)) {
+            try {
+                signsRecognized = CircleRecognize.cirleRecognize(frame, this, minRad, maxRad, param1, param2, dp);
+                signsRecognized.addAll(TraingleDetection.detectTriangles(frame, this, epsilon, areaMax));
+                showSignsOnScreen(signsRecognized);
+            } catch (Exception e) {
+                Log.e("Main activity", "EXCEPTION!", e);
+            }
         }
-//        } catch (Exception e) {
-//            Log.e("Main activity", "EXCEPTION!", e);
-//        }
-//        }
         return frame;
     }
 
@@ -229,7 +165,6 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
                 @Override
                 public void run() {
                     for (Mat circle : circles) {
-                        //Imgproc.cvtColor(circle, circle, Imgproc.COLOR_BGR2RGB);
                         Bitmap bmp = Bitmap.createBitmap(circle.width(), circle.height(), Bitmap.Config.ARGB_8888);
                         Utils.matToBitmap(circle, bmp);
                         SsrUtils.findProperViewAndShowImage(MainActivity.this, signViewCount, bmp, circle, mp);
@@ -258,28 +193,28 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
 //        txtCurrentSpeed.setText(nCurrentSpeed + " " + strUnits);
     }
 
-    private void setIgnoreFramesCount(double currentSpeed){
-        if(currentSpeed >= 80.0){
+    private void setIgnoreFramesCount(double currentSpeed) {
+        if (currentSpeed >= 80.0) {
             ignoreFrames = 0;
-        } else if(currentSpeed >= 70.0 && currentSpeed < 80.0){
+        } else if (currentSpeed >= 70.0 && currentSpeed < 80.0) {
             ignoreFrames = 3;
-        } else if(currentSpeed >= 60.0 && currentSpeed < 70.0){
+        } else if (currentSpeed >= 60.0 && currentSpeed < 70.0) {
             ignoreFrames = 3;
-        } else if(currentSpeed >= 50.0 && currentSpeed < 60.0){
+        } else if (currentSpeed >= 50.0 && currentSpeed < 60.0) {
             ignoreFrames = 3;
-        } else if(currentSpeed >= 40.0 && currentSpeed < 50.0){
+        } else if (currentSpeed >= 40.0 && currentSpeed < 50.0) {
             ignoreFrames = 3;
-        } else if(currentSpeed >= 30.0 && currentSpeed < 40.0){
+        } else if (currentSpeed >= 30.0 && currentSpeed < 40.0) {
             ignoreFrames = 4;
-        } else if(currentSpeed >= 20.0 && currentSpeed < 30.0){
+        } else if (currentSpeed >= 20.0 && currentSpeed < 30.0) {
             ignoreFrames = 5;
-        } else if(currentSpeed >= 10.0 && currentSpeed < 20.0){
+        } else if (currentSpeed >= 10.0 && currentSpeed < 20.0) {
             ignoreFrames = 6;
-        } else if(currentSpeed >= 7.0 && currentSpeed < 10.0){
+        } else if (currentSpeed >= 7.0 && currentSpeed < 10.0) {
             ignoreFrames = 7;
-        } else if(currentSpeed >= 3.0 && currentSpeed < 7.0){
+        } else if (currentSpeed >= 3.0 && currentSpeed < 7.0) {
             ignoreFrames = 8;
-        } else if(currentSpeed >= 0.0 && currentSpeed < 3.0){
+        } else if (currentSpeed >= 0.0 && currentSpeed < 3.0) {
             ignoreFrames = -1;
         }
     }

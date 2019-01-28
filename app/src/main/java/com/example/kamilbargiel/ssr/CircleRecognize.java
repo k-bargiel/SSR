@@ -12,9 +12,6 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import static com.example.kamilbargiel.ssr.SsrUtils.saveOnDevice;
 
 public class CircleRecognize {
 
@@ -27,7 +24,6 @@ public class CircleRecognize {
 
         Imgproc.medianBlur(inputFrame, blurred, 3);
         Imgproc.cvtColor(blurred, hsv, Imgproc.COLOR_RGB2HSV); // device frame
-//        Imgproc.cvtColor(blurred, hsv, Imgproc.COLOR_BGR2HSV); // image frame
         Core.inRange(hsv, new Scalar(0, 70, 50), new Scalar(10, 255, 255), lowerRed); //this
         Core.inRange(hsv, new Scalar(170, 70, 50), new Scalar(179, 255, 255), upperRed); //this
         Core.addWeighted(lowerRed, 1.0, upperRed, 1.0, 0.0, hsv); // this

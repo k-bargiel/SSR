@@ -35,7 +35,7 @@ public class TraingleDetection {
 //        Imgproc.GaussianBlur(yellow, yellow, new Size(5, 5), 0);
         Imgproc.findContours(yellow, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
         Imgproc.drawContours(inputFrame, contours, -1, new Scalar(255, 0, 0), 1);
-SsrUtils.saveOnDevice(inputFrame, context);
+//        SsrUtils.saveOnDevice(inputFrame, context);
         for (MatOfPoint cnt : contours) {
             double contourArea = Imgproc.contourArea(cnt);
             double area = Math.abs(contourArea);
@@ -51,19 +51,18 @@ SsrUtils.saveOnDevice(inputFrame, context);
                 Rect rect = Imgproc.boundingRect(result);
                 Mat sign = getSignFromImage(inputFrame, rect);
                 output.add(sign);
-                SsrUtils.saveOnDevice(sign, context);
-                // draw enclosing rectangle (all same color, but you could use variable i to make them unique)
+//                SsrUtils.saveOnDevice(sign, context);
                 Imgproc.rectangle(inputFrame, new Point(rect.x, rect.y), new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(10, 255, 255), 3);
                 triangleContours.add(cnt);
             }
         }
-        SsrUtils.saveOnDevice(inputFrame, context);
-        SsrUtils.saveOnDevice(yellow, context);
+//        SsrUtils.saveOnDevice(inputFrame, context);
+//        SsrUtils.saveOnDevice(yellow, context);
 //        Imgproc.drawContours(inputFrame, triangleContours, -1, new Scalar(89, 255, 255), 3);
 //        Imgproc.drawContours(inputFrame, contours, -1, new Scalar(89, 255, 255), 5)
 
         hsv.release();
-//        yellow.release();
+        yellow.release();
         triangles.release();
         blurred.release();
 
