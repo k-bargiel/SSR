@@ -94,26 +94,26 @@
             android:src="@mipmap/ic_launcher_round"
             android:visibility="invisible" />
 
-        <EditText
-            android:id="@+id/epsilon"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:padding="12dp">
-
-            <requestFocus />
-        </EditText>
-
-        <EditText
-            android:id="@+id/area"
-            android:layout_width="match_parent"
-            android:layout_below="@+id/epsilon"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:padding="12dp">
-
-            <requestFocus />
-        </EditText>
+        <!--<EditText-->
+            <!--android:id="@+id/epsilon"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:inputType="text"-->
+            <!--android:padding="12dp">-->
+<!---->
+            <!--<requestFocus />-->
+        <!--</EditText>-->
+<!---->
+        <!--<EditText-->
+            <!--android:id="@+id/area"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_below="@+id/epsilon"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:inputType="text"-->
+            <!--android:padding="12dp">-->
+<!---->
+            <!--<requestFocus />-->
+        <!--</EditText>-->
 
     </RelativeLayout>
 

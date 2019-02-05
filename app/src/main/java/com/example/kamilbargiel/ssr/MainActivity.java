@@ -27,6 +27,7 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class MainActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, IBaseGpsListener {
@@ -146,12 +147,22 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
             framesCount = 0;
         }
 
-        List<Mat> signsRecognized;
+        List<Mat> signsRecognized = new LinkedList<>();
+//        try {
+//            signsRecognized = TraingleDetection.detectTriangles(frame, this, epsilon, areaMax);
+//        } catch (Exception e) {
+//            Log.e("Main activity", "EXCEPTION!", e);
+//        }
         if (ignoreFrames != -1 && (ignoreFrames == 0 || framesCount % ignoreFrames == 0)) {
             try {
-                signsRecognized = CircleRecognize.cirleRecognize(frame, this, minRad, maxRad, param1, param2, dp);
-                signsRecognized.addAll(TraingleDetection.detectTriangles(frame, this, epsilon, areaMax));
-                showSignsOnScreen(signsRecognized);
+                signsRecognized.addAll(CircleRecognize.cirleRecognize(frame, this, minRad, maxRad, param1, param2, dp));
+            } catch (Exception e) {
+                Log.e("Main activity", "EXCEPTION!", e);
+            }
+        }
+        if(!signsRecognized.isEmpty()) {
+            try {
+            showSignsOnScreen(signsRecognized);
             } catch (Exception e) {
                 Log.e("Main activity", "EXCEPTION!", e);
             }
@@ -197,23 +208,23 @@ public class MainActivity extends Activity implements CameraBridgeViewBase.CvCam
         if (currentSpeed >= 80.0) {
             ignoreFrames = 0;
         } else if (currentSpeed >= 70.0 && currentSpeed < 80.0) {
-            ignoreFrames = 3;
-        } else if (currentSpeed >= 60.0 && currentSpeed < 70.0) {
-            ignoreFrames = 3;
-        } else if (currentSpeed >= 50.0 && currentSpeed < 60.0) {
-            ignoreFrames = 3;
-        } else if (currentSpeed >= 40.0 && currentSpeed < 50.0) {
-            ignoreFrames = 3;
-        } else if (currentSpeed >= 30.0 && currentSpeed < 40.0) {
             ignoreFrames = 4;
-        } else if (currentSpeed >= 20.0 && currentSpeed < 30.0) {
+        } else if (currentSpeed >= 60.0 && currentSpeed < 70.0) {
+            ignoreFrames = 4;
+        } else if (currentSpeed >= 50.0 && currentSpeed < 60.0) {
+            ignoreFrames = 4;
+        } else if (currentSpeed >= 40.0 && currentSpeed < 50.0) {
             ignoreFrames = 5;
-        } else if (currentSpeed >= 10.0 && currentSpeed < 20.0) {
+        } else if (currentSpeed >= 30.0 && currentSpeed < 40.0) {
             ignoreFrames = 6;
-        } else if (currentSpeed >= 7.0 && currentSpeed < 10.0) {
+        } else if (currentSpeed >= 20.0 && currentSpeed < 30.0) {
             ignoreFrames = 7;
-        } else if (currentSpeed >= 3.0 && currentSpeed < 7.0) {
+        } else if (currentSpeed >= 10.0 && currentSpeed < 20.0) {
             ignoreFrames = 8;
+        } else if (currentSpeed >= 7.0 && currentSpeed < 10.0) {
+            ignoreFrames = 9;
+        } else if (currentSpeed >= 3.0 && currentSpeed < 7.0) {
+            ignoreFrames = 10;
         } else if (currentSpeed >= 0.0 && currentSpeed < 3.0) {
             ignoreFrames = -1;
         }
